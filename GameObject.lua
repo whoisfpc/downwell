@@ -1,24 +1,37 @@
 local Object = require("classic/classic")
 local GameObject = Object:extend()
-local Timer = require("hump/timer")
+Timer = require("hump/timer")
+Vector = require("hump/vector")
 
-function GameObject:new(x, y, opts)
+function GameObject:new(type, x, y, opts)
+    self.type = type
     self.x, self.y = x, y
+    self.previousX, self.previousY = self.x, self.y
     local opts = opts or {}
     for k, v in pairs(opts) do
         self[k] = v
     end
     self.dead = false
-    Timer.every(0.01, function() createGameObject('Trail', self.x, self.y, {r = 25}) end)
+    Timer.every(0.01, function()
+        createGameObject('Trail', self.x, self.y,
+            {r = 20, xm = self.xm, ym = self.ym, angle = self.angle})
+    end)
 end
 
 function GameObject:update(dt)
     local x, y = love.mouse.getPosition() 
     self.x, self.y = x / 3, y / 3
+    self.angle = math.atan2(self.y - self.previousY, self.x - self.previousX)
+    self.vmag = Vector(self.x - self.previousX, self.y - self.previousY):len()
+    self.xm = map(self.vmag, 0, 20, 1, 2)
+    self.ym = map(self.vmag, 0, 20, 1, 0.25)
+    self.previousX, self.previousY = self.x, self.y
 end
 
 function GameObject:draw()
-    love.graphics.circle('fill', self.x, self.y, 25)
+    pushRotate(self.x, self.y, self.angle)
+    love.graphics.ellipse('fill', self.x, self.y, self.xm * 15, self.ym * 15)
+    love.graphics.pop()
 end
 
 return GameObject
