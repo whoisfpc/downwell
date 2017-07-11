@@ -10,7 +10,7 @@ function love.load()
 end
 
 function love.update(dt)
-    timer.update(dt)
+    timer:update(dt)
     for i = #gameObjects, 1, -1 do
         local gameObject = gameObjects[i]
         gameObject:update(dt)
