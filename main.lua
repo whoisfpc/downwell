@@ -22,13 +22,28 @@ function love.load()
             end
         end
     end)
+    ballTime = 0
+    ballSpeed = 300
+    ballHeight = 150
+    ballCount = 3
+    ballPeriod = 2
 end
 
 function love.update(dt)
+    ballTime = ballTime + dt
+    local flag = false
+    if ballTime > 2*ballPeriod then
+        ballTime = ballTime - 2*ballPeriod
+    elseif ballTime > ballPeriod then
+        flag = true
+    end
+    local x = ballTime * ballSpeed / ballPeriod + 10
+    if flag then x = 2*ballSpeed + 10 - ballTime * ballSpeed / ballPeriod end
+    local y = 200 - math.abs(math.sin(ballTime / ballPeriod * math.pi * ballCount)) * ballHeight
     Timer.update(dt)
     for i = #gameObjects, 1, -1 do
         local gameObject = gameObjects[i]
-        gameObject:update(dt)
+        gameObject:update(dt, x, y)
         if gameObject.dead then
             table.remove(gameObjects, i)
         end
@@ -44,7 +59,7 @@ function love.draw()
         end
     end
 
-    pushRotate(160, 120, gameObject.angle + math.pi / 2)
+   -- pushRotate(160, 120, gameObject.angle + math.pi / 2)
     love.graphics.setBlendMode('subtract')
     for i = -360, 720, 2 do
         love.graphics.line(i, -240, i, 480)
@@ -53,7 +68,7 @@ function love.draw()
         end
     end
     love.graphics.setBlendMode('alpha')
-    love.graphics.pop()    
+    --love.graphics.pop()    
     love.graphics.setCanvas()
 
     love.graphics.setCanvas(gameObjectCanvas)

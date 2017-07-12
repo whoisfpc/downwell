@@ -18,9 +18,10 @@ function GameObject:new(type, x, y, opts)
     end)
 end
 
-function GameObject:update(dt)
-    local x, y = love.mouse.getPosition() 
-    self.x, self.y = x / 3, y / 3
+function GameObject:update(dt, px, py)
+    local x, y = love.mouse.getPosition()
+    self.x = px or x / 3
+    self.y = py or y / 3
     self.angle = math.atan2(self.y - self.previousY, self.x - self.previousX)
     self.vmag = Vector(self.x - self.previousX, self.y - self.previousY):len()
     self.xm = map(self.vmag, 0, 20, 1, 2)
